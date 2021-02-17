@@ -39,7 +39,7 @@ namespace LearningAI
             }
         }
 
-        private void Draw(IPopulation population, Point goal)
+        private void Draw(Population population, Point goal)
         {
             using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             using Graphics graphics = Graphics.FromImage(bitmap);

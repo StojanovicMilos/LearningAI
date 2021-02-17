@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace LearningAI
 {
-    public class Population : IPopulation
+    public class Population
     {
         private Dot[] _dots;
         private int _generation = 1;
