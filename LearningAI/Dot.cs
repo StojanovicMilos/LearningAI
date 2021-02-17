@@ -16,7 +16,7 @@ namespace LearningAI
         public Dot(Point goal)
         {
             _goal = goal;
-            Brain = new Brain(1000);
+            Brain = new Brain(500);
         }
 
         public Dot(Dot dot)
@@ -77,14 +77,7 @@ namespace LearningAI
 
         public void CalculateFitness()
         {
-            if (_reachedGoal)
-            {
-                Fitness = 1.0 / 16.0 + 10000.0 / (Brain.Step * Brain.Step);
-            }
-            else
-            {
-                Fitness = 1.0 / DistanceToGoalSquared();
-            }
+            Fitness = _reachedGoal ? 0.0625 + 10000.0 / (Brain.Step * Brain.Step) : 1.0 / DistanceToGoalSquared();
         }
 
         private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) +

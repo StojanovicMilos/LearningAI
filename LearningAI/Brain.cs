@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 
 namespace LearningAI
 {
@@ -26,16 +27,7 @@ namespace LearningAI
 
         public Point GetNextDirection() => _directions[Step++];
 
-        public Brain Copy()
-        {
-            Brain brain = new Brain {_directions = new Point[_directions.Length]};
-            for (int i = 0; i < _directions.Length; i++)
-            {
-                brain._directions[i] = new Point(_directions[i].X, _directions[i].Y);
-            }
-
-            return brain;
-        }
+        public Brain Copy() => new Brain {_directions = _directions.Select(d => new Point(d.X, d.Y)).ToArray()};
 
         public void Mutate()
         {

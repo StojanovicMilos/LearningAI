@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -59,10 +58,9 @@ namespace LearningAI
         private void NaturalSelection()
         {
             Dot[] newDots = new Dot[_dots.Length];
-            int bestDotIndex = GetBestDotIndex();
-            double fitnessSum = CalculateFitnessSum();
+            double fitnessSum = _dots.Sum(d => d.Fitness);
 
-            newDots[0] = new Dot(_dots[bestDotIndex]);
+            newDots[0] = new Dot(_dots.WithMaximum(d=>d.Fitness));
             
             for (int i = 1; i < newDots.Length; i++)
             {
@@ -76,13 +74,14 @@ namespace LearningAI
 
         public override string ToString() => $"Generation: {_generation}, iteration: {_dots.Max(d => d.Brain.Step)}";
 
+        private readonly Random _random = new Random();
+
         private Dot SelectParent(double fitnessSum)
         {
-            Random random = new Random();
-            double randomFitness = random.NextDouble() * fitnessSum;
+            double randomFitness = _random.NextDouble() * fitnessSum;
 
             double runningSum = 0;
-            foreach (var dot in _dots.OrderBy(d=> random.NextDouble()))
+            foreach (var dot in _dots)
             {
                 runningSum += dot.Fitness;
                 if (runningSum > randomFitness)
@@ -92,27 +91,6 @@ namespace LearningAI
             return _dots.Last();
         }
 
-        private double CalculateFitnessSum()
-        {
-            return _dots.Sum(d => d.Fitness);
-        }
-
-        private int GetBestDotIndex()
-        {
-            double max = 0;
-            int maxIndex = 0;
-            for (int i = 0; i < _dots.Length; i++)
-            {
-                if (_dots[i].Fitness > max)
-                {
-                    max = _dots[i].Fitness;
-                    maxIndex = i;
-                }
-            }
-
-
-            return maxIndex;
-        }
 
         private void MutateBabies()
         {

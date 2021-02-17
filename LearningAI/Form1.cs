@@ -20,19 +20,19 @@ namespace LearningAI
         {
             var goal = new Point(400, 10);
             Mutex mutex = new Mutex();
-            //var population = new SynchronizingPopulation(new Population(1000, goal), mutex);
-            var population = new Population(1000, goal);
+            var population = new SynchronizingPopulation(new Population(50000, goal), mutex);
+            //var population = new Population(1000, goal);
 
-            //Thread thread = new Thread(population.Update);
-            //thread.Start();
+            Thread thread = new Thread(population.Update);
+            thread.Start();
 
             while (true)
             {
-                //mutex.WaitOne();
-                population.Update();
+                mutex.WaitOne();
+                //population.Update();
                 Draw(population, goal);
-                //mutex.ReleaseMutex();
-                Thread.Sleep(15);
+                mutex.ReleaseMutex();
+                //Thread.Sleep(15);
             }
         }
 
