@@ -11,24 +11,24 @@ namespace LearningAI
         private Point _acceleration = new Point(0, 0);
         private readonly bool _isBest;
         private readonly Point _goal;
-        private bool _reachedGoal;
         
+        private Brain _brain;
+
         public Dot(Point goal)
         {
             _goal = goal;
-            Brain = new Brain(500);
+            _brain = new Brain(500);
         }
 
         public Dot(Dot dot)
         {
             _goal = dot._goal;
-            Brain = dot.Brain.Copy();
+            _brain = dot._brain.Copy();
             _isBest = true;
         }
 
-        public bool IsDead { get; set; }
-        public Brain Brain { get; private set; }
-
+        public bool IsDead { get; private set; }
+        public bool ReachedGoal { get; private set; }
         public double Fitness { get; private set; }
 
         public DotPosition GetDotPosition()
@@ -41,9 +41,9 @@ namespace LearningAI
 
         private void Move()
         {
-            if (Brain.HasDirections)
+            if (_brain.HasDirections)
             {
-                _acceleration = Brain.GetNextDirection();
+                _acceleration = _brain.GetNextDirection();
             }
             else
             {
@@ -75,13 +75,19 @@ namespace LearningAI
             _positionY += _velocityY;
         }
 
-        public void CalculateFitness() => Fitness = _reachedGoal ? 0.0625 + 10000.0 / (Brain.Step * Brain.Step) : 1.0 / DistanceToGoalSquared();
+        public void CalculateFitness() => Fitness = ReachedGoal ? 0.0625 + 10000.0 / (_brain.Step * _brain.Step) : 1.0 / DistanceToGoalSquared();
 
         private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
 
         public void Update()
         {
-            if (IsDead || _reachedGoal) return;
+            if (IsDead || ReachedGoal) return;
+
+            if (!_brain.HasDirections)
+            {
+                IsDead = true;
+                return;
+            }
 
             Move();
             if (_positionX < 2 || _positionY < 2 || _positionX > 798 || _positionY > 798)
@@ -90,7 +96,7 @@ namespace LearningAI
             }
             else if (DistanceToGoalSquared() < 25) // less than 5 pixels from goal
             {
-                _reachedGoal = true;
+                ReachedGoal = true;
                 IsDead = true;
             }
             else if (_positionX < 600 && _positionY < 310 && _positionX > 0 && _positionY > 300)
@@ -103,8 +109,8 @@ namespace LearningAI
             }
         }
 
-        public Dot CreateBaby() => new Dot(_goal) { Brain = Brain.Copy() };
+        public Dot CreateBaby() => new Dot(_goal) { _brain = _brain.Copy() };
 
-        public void MutateBrain() => Brain.Mutate();
+        public void MutateBrain() => _brain.Mutate();
     }
 }

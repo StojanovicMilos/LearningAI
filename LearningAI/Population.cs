@@ -9,6 +9,7 @@ namespace LearningAI
     {
         private Dot[] _dots;
         private int _generation = 1;
+        private int _iteration;
 
         public Population(uint size, Point goal)
         {
@@ -21,9 +22,9 @@ namespace LearningAI
 
         public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
 
-        private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
+        private bool ShouldEndGeneration() => _dots.All(d => d.IsDead) || _dots.Any(d => d.ReachedGoal);
 
-        public override string ToString() => $"Generation: {_generation}, iteration: {_dots.Max(d => d.Brain.Step)}";
+        public override string ToString() => $"Generation: {_generation}, iteration: {_iteration}";
 
         public void Update()
         {
@@ -32,19 +33,14 @@ namespace LearningAI
                 CalculateFitness();
                 NaturalSelection();
                 MutateBabies();
+                _iteration = 0;
             }
             else
             {
+                _iteration++;
                 foreach (var dot in _dots)
                 {
-                    if (!dot.Brain.HasDirections)
-                    {
-                        dot.IsDead = true;
-                    }
-                    else
-                    {
-                        dot.Update();
-                    }
+                    dot.Update();
                 }
             }
         }
