@@ -19,25 +19,30 @@ namespace LearningAI
         private void Form1_Click(object sender, System.EventArgs e)
         {
             var goal = new Point(400, 10);
-            Mutex mutex = new Mutex();
-            var population = new SynchronizingPopulation(new Population(50000, goal), mutex);
+            var population = new Population(50000, goal);
 
-            Thread thread = new Thread(population.Update);
+            Thread thread = new Thread(() => Update(population));
             thread.Start();
 
             while (true)
             {
-                mutex.WaitOne();
                 Draw(population, goal);
-                mutex.ReleaseMutex();
                 Thread.Sleep(15);
+            }
+        }
+
+        private void Update(Population population)
+        {
+            while (true)
+            {
+                population.Update();
             }
         }
 
         private void Draw(IPopulation population, Point goal)
         {
-            Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            Graphics graphics = Graphics.FromImage(bitmap);
+            using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            using Graphics graphics = Graphics.FromImage(bitmap);
             graphics.FillRectangle(_obstacleBrush, 0, 300, 600, 10);
             graphics.FillRectangle(_obstacleBrush, 200, 500, 610, 10);
             graphics.FillEllipse(_goalBrush, goal.X, goal.Y, 8, 8);
@@ -55,6 +60,7 @@ namespace LearningAI
                 }
             }
 
+            pictureBox1.Image?.Dispose();
             pictureBox1.Image = bitmap;
             pictureBox1.Refresh();
         }

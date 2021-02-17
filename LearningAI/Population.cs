@@ -22,7 +22,9 @@ namespace LearningAI
         public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
 
         private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
-        
+
+        public override string ToString() => $"Generation: {_generation}, iteration: {_dots.Max(d => d.Brain.Step)}";
+
         public void Update()
         {
             if (ShouldEndGeneration())
@@ -58,13 +60,16 @@ namespace LearningAI
         private void NaturalSelection()
         {
             Dot[] newDots = new Dot[_dots.Length];
-            double fitnessSum = _dots.Sum(d => d.Fitness);
+            var bestDot = _dots.WithMaximum(d => d.Fitness);
+            newDots[0] = new Dot(bestDot);
 
-            newDots[0] = new Dot(_dots.WithMaximum(d=>d.Fitness));
-            
+            var bestDots = _dots.Where(d => d.Fitness >= 0.9 * bestDot.Fitness).ToArray();
+            double fitnessSum = bestDots.Sum(d => d.Fitness);
+
+
             for (int i = 1; i < newDots.Length; i++)
             {
-                Dot parent = SelectParent(fitnessSum);
+                Dot parent = SelectParent(bestDots, fitnessSum);
                 newDots[i] = parent.CreateBaby();
             }
 
@@ -72,23 +77,21 @@ namespace LearningAI
             _generation++;
         }
 
-        public override string ToString() => $"Generation: {_generation}, iteration: {_dots.Max(d => d.Brain.Step)}";
-
         private readonly Random _random = new Random();
 
-        private Dot SelectParent(double fitnessSum)
+        private Dot SelectParent(Dot[] bestDots, double fitnessSum)
         {
             double randomFitness = _random.NextDouble() * fitnessSum;
 
             double runningSum = 0;
-            foreach (var dot in _dots)
+            foreach (var dot in bestDots)
             {
                 runningSum += dot.Fitness;
                 if (runningSum > randomFitness)
                     return dot;
             }
 
-            return _dots.Last();
+            throw new InvalidOperationException("The code should not reach here");
         }
 
 
