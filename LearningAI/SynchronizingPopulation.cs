@@ -24,7 +24,6 @@ namespace LearningAI
                 _mutex.WaitOne();
                 _population.Update();
                 _mutex.ReleaseMutex();
-                //Thread.Sleep(1);
             }
         }
 

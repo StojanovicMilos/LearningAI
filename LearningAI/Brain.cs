@@ -18,9 +18,7 @@ namespace LearningAI
             }
         }
 
-        private Brain()
-        {
-        }
+        private Brain() { }
 
         public bool HasDirections => Step < _directions.Length;
         public uint Step { get; private set; }

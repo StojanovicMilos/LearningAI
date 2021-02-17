@@ -21,7 +21,6 @@ namespace LearningAI
             var goal = new Point(400, 10);
             Mutex mutex = new Mutex();
             var population = new SynchronizingPopulation(new Population(50000, goal), mutex);
-            //var population = new Population(1000, goal);
 
             Thread thread = new Thread(population.Update);
             thread.Start();
@@ -29,10 +28,9 @@ namespace LearningAI
             while (true)
             {
                 mutex.WaitOne();
-                //population.Update();
                 Draw(population, goal);
                 mutex.ReleaseMutex();
-                //Thread.Sleep(15);
+                Thread.Sleep(15);
             }
         }
 
@@ -59,7 +57,6 @@ namespace LearningAI
 
             pictureBox1.Image = bitmap;
             pictureBox1.Refresh();
-            //pictureBox1.Invalidate();
         }
     }
 }

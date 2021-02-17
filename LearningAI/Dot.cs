@@ -75,13 +75,9 @@ namespace LearningAI
             _positionY += _velocityY;
         }
 
-        public void CalculateFitness()
-        {
-            Fitness = _reachedGoal ? 0.0625 + 10000.0 / (Brain.Step * Brain.Step) : 1.0 / DistanceToGoalSquared();
-        }
+        public void CalculateFitness() => Fitness = _reachedGoal ? 0.0625 + 10000.0 / (Brain.Step * Brain.Step) : 1.0 / DistanceToGoalSquared();
 
-        private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) +
-                                                  (_positionY - _goal.Y) * (_positionY - _goal.Y);
+        private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
 
         public void Update()
         {
