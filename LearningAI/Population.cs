@@ -4,9 +4,10 @@ using System.Linq;
 
 namespace LearningAI
 {
-    public class Population
+    public class Population : IPopulation
     {
         private Dot[] _dots;
+        private int _generation = 1;
 
         public Population(uint size, Graphics graphics, Point goal)
         {
@@ -25,27 +26,33 @@ namespace LearningAI
             }
         }
 
-        public bool ShouldEndGeneration() => /*AnyDotReachedGoal() ||*/ AllDotsDead();
-
-        private bool AnyDotReachedGoal() => _dots.Any(d => d.ReachedGoal);
-        private bool AllDotsDead() => _dots.All(d => d.IsDead);
-
+        private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
+        
         public void Update()
         {
-            foreach (var dot in _dots)
+            if (ShouldEndGeneration())
             {
-                if (!dot.Brain.HasDirections)
+                CalculateFitness();
+                NaturalSelection();
+                MutateBabies();
+            }
+            else
+            {
+                foreach (var dot in _dots)
                 {
-                    dot.IsDead = true;
-                }
-                else
-                {
-                    dot.Update();
+                    if (!dot.Brain.HasDirections)
+                    {
+                        dot.IsDead = true;
+                    }
+                    else
+                    {
+                        dot.Update();
+                    }
                 }
             }
         }
 
-        public void CalculateFitness()
+        private void CalculateFitness()
         {
             foreach (var dot in _dots)
             {
@@ -53,7 +60,7 @@ namespace LearningAI
             }
         }
 
-        public void NaturalSelection()
+        private void NaturalSelection()
         {
             Dot[] newDots = new Dot[_dots.Length];
             int bestDotIndex = GetBestDotIndex();
@@ -68,11 +75,10 @@ namespace LearningAI
             }
 
             _dots = newDots;
-            Generation++;
+            _generation++;
         }
 
-        public int Generation { get; private set; } = 1;
-        public uint Iteration => _dots.Max(d => d.Brain.Step);
+        public override string ToString() => $"Generation: {_generation}, iteration: {_dots.Max(d => d.Brain.Step)}";
 
         private Dot SelectParent(double fitnessSum)
         {
@@ -112,7 +118,7 @@ namespace LearningAI
             return maxIndex;
         }
 
-        public void MutateBabies()
+        private void MutateBabies()
         {
             foreach (var dot in _dots.Skip(1))
             {
