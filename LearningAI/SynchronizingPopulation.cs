@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 namespace LearningAI
@@ -14,7 +14,8 @@ namespace LearningAI
             _mutex = mutex;
         }
 
-        public void Show() => _population.Show();
+
+        public IEnumerable<DotPosition> GetDotPositions() => _population.GetDotPositions();
 
         public void Update()
         {
@@ -23,6 +24,7 @@ namespace LearningAI
                 _mutex.WaitOne();
                 _population.Update();
                 _mutex.ReleaseMutex();
+                //Thread.Sleep(1);
             }
         }
 

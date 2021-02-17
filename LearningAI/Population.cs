@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -9,22 +11,16 @@ namespace LearningAI
         private Dot[] _dots;
         private int _generation = 1;
 
-        public Population(uint size, Graphics graphics, Point goal)
+        public Population(uint size, Point goal)
         {
             _dots = new Dot[size];
             for (int i = 0; i < _dots.Length; i++)
             {
-                _dots[i] = new Dot(graphics, goal);
+                _dots[i] = new Dot(goal);
             }
         }
 
-        public void Show()
-        {
-            foreach (var dot in _dots)
-            {
-                dot.Show();
-            }
-        }
+        public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
 
         private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
         

@@ -1,8 +1,10 @@
-﻿namespace LearningAI
+﻿using System.Collections.Generic;
+
+namespace LearningAI
 {
     public interface IPopulation
     {
-        void Show();
+        IEnumerable<DotPosition> GetDotPositions();
         void Update();
     }
 }
