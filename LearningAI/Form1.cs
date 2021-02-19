@@ -10,45 +10,35 @@ namespace LearningAI
         private readonly SolidBrush _obstacleBrush = new SolidBrush(Color.Red);
         private readonly SolidBrush _dotBrush = new SolidBrush(Color.Black);
         private readonly Pen _dotPen = new Pen(Color.Blue);
+        private readonly Point _goal;
+        private readonly Population _population;
 
         public Form1()
         {
             InitializeComponent();
-        }
 
-        private void Form1_Click(object sender, System.EventArgs e)
-        {
-            var goal = new Point(400, 10);
-            var population = new Population(50000, goal);
+            _goal = new Point(400, 10);
+            _population = new Population(50000, _goal);
 
-            Thread thread = new Thread(() => Update(population));
-            thread.Start();
-
-            while (true)
+            new Thread(() =>
             {
-                Draw(population, goal);
-                Thread.Sleep(15);
-            }
+                while (true)
+                {
+                    _population.Update();
+                }
+            }).Start();
         }
 
-        private void Update(Population population)
-        {
-            while (true)
-            {
-                population.Update();
-            }
-        }
-
-        private void Draw(Population population, Point goal)
+        private void timer1_Tick(object sender, System.EventArgs e)
         {
             using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             using Graphics graphics = Graphics.FromImage(bitmap);
             graphics.FillRectangle(_obstacleBrush, 0, 300, 600, 10);
             graphics.FillRectangle(_obstacleBrush, 200, 500, 610, 10);
-            graphics.FillEllipse(_goalBrush, goal.X, goal.Y, 8, 8);
+            graphics.FillEllipse(_goalBrush, _goal.X, _goal.Y, 8, 8);
 
-            Text = population.ToString();
-            foreach (var dotPosition in population.GetDotPositions())
+            Text = _population.ToString();
+            foreach (var dotPosition in _population.GetDotPositions())
             {
                 if (dotPosition.IsBest)
                 {
