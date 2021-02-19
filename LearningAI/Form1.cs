@@ -33,8 +33,11 @@ namespace LearningAI
         {
             using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.FillRectangle(_obstacleBrush, 0, 300, 600, 10);
-            graphics.FillRectangle(_obstacleBrush, 200, 500, 610, 10);
+            foreach (var obstacle in Obstacles.Get())
+            {
+                graphics.FillRectangle(_obstacleBrush, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
+            }
+            
             graphics.FillEllipse(_goalBrush, _goal.X, _goal.Y, 8, 8);
 
             Text = _population.ToString();
@@ -42,7 +45,7 @@ namespace LearningAI
             {
                 if (dotPosition.IsBest)
                 {
-                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 8, 8);
+                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 4, 4);
                 }
                 else
                 {

@@ -51,7 +51,7 @@
             // 
             // Form1
             // 
-            this.BackColor = System.Drawing.Color.Red;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(853, 833);
             this.Controls.Add(this.pictureBox1);
             this.Name = "Form1";

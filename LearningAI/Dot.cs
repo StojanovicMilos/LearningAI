@@ -17,7 +17,7 @@ namespace LearningAI
         public Dot(Point goal)
         {
             _goal = goal;
-            _brain = new Brain(500);
+            _brain = new Brain(1000);
         }
 
         public Dot(Dot dot)
@@ -75,7 +75,10 @@ namespace LearningAI
 
         public void Update()
         {
-            if (IsDead || ReachedGoal) return;
+            if (IsDead || ReachedGoal)
+            {
+                return;
+            }
 
             if (!_brain.HasDirections)
             {
@@ -84,20 +87,12 @@ namespace LearningAI
             }
 
             Move();
-            if (_positionX < 2 || _positionY < 2 || _positionX > 798 || _positionY > 798)
-            {
-                IsDead = true;
-            }
-            else if (DistanceToGoalSquared() < 25) // less than 5 pixels from goal
+            if (DistanceToGoalSquared() < 4)
             {
                 ReachedGoal = true;
                 IsDead = true;
             }
-            else if (_positionX < 600 && _positionY < 310 && _positionX > 0 && _positionY > 300)
-            {
-                IsDead = true;
-            }
-            else if (_positionX < 800 && _positionY < 510 && _positionX > 200 && _positionY > 500)
+            else if (Obstacles.AnyHitBy(GetDotPosition()))
             {
                 IsDead = true;
             }
