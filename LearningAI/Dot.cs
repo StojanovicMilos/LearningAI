@@ -11,7 +11,7 @@ namespace LearningAI
         private Point _acceleration = new Point(0, 0);
         private readonly bool _isBest;
         private readonly Point _goal;
-        
+
         private Brain _brain;
 
         public Dot(Point goal)
@@ -31,13 +31,7 @@ namespace LearningAI
         public bool ReachedGoal { get; private set; }
         public double Fitness { get; private set; }
 
-        public DotPosition GetDotPosition()
-        {
-            return new DotPosition
-            {
-                X = _positionX, Y = _positionY, IsBest = _isBest
-            };
-        }
+        public DotPosition GetDotPosition() => new DotPosition {X = _positionX, Y = _positionY, IsBest = _isBest};
 
         private void Move()
         {
