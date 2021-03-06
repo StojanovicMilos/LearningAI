@@ -18,7 +18,7 @@ namespace LearningAI
             InitializeComponent();
 
             _goal = new Point(400, 10);
-            _population = new Population(100000, _goal);
+            _population = new Population(35000, _goal);
 
             new Thread(() =>
             {
@@ -45,7 +45,7 @@ namespace LearningAI
             {
                 if (dotPosition.IsBest)
                 {
-                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 4, 4);
+                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 8, 8);
                 }
                 else
                 {
