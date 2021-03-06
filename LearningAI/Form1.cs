@@ -9,7 +9,8 @@ namespace LearningAI
         private readonly SolidBrush _goalBrush = new SolidBrush(Color.Green);
         private readonly SolidBrush _obstacleBrush = new SolidBrush(Color.Red);
         private readonly SolidBrush _dotBrush = new SolidBrush(Color.Black);
-        private readonly Pen _dotPen = new Pen(Color.Blue);
+        private readonly SolidBrush _backgroundBrush = new SolidBrush(Color.Gray);
+        private readonly Pen _dotPen = new Pen(Color.YellowGreen);
         private readonly Point _goal;
         private readonly Population _population;
 
@@ -33,6 +34,7 @@ namespace LearningAI
         {
             using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             using Graphics graphics = Graphics.FromImage(bitmap);
+            graphics.FillRectangle(_backgroundBrush, 0, 0, bitmap.Width, bitmap.Height);
             foreach (var obstacle in Obstacles.Get())
             {
                 graphics.FillRectangle(_obstacleBrush, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
@@ -45,7 +47,7 @@ namespace LearningAI
             {
                 if (dotPosition.IsBest)
                 {
-                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 8, 8);
+                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 4, 4);
                 }
                 else
                 {
