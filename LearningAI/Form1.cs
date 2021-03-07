@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,6 +15,10 @@ namespace LearningAI
         private readonly Point _goal;
         private readonly Population _population;
 
+
+        private Bitmap _bmpLive = new Bitmap(1,1);
+        private Bitmap _bmpLast = new Bitmap(1,1);
+
         public Form1()
         {
             InitializeComponent();
@@ -28,13 +33,53 @@ namespace LearningAI
                     _population.Update();
                 }
             }).Start();
+
+            new Thread(RenderForever).Start();
+        }
+
+        private void RenderForever()
+        {
+            int maxFPS = 100;
+            int minFramePeriodMilliseconds = 1000 / maxFPS;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            while (true)
+            {
+                // Render on the "live" Bitmap
+                Render();
+
+                // Lock and update the "display" Bitmap
+                lock (_bmpLast)
+                {
+                    _bmpLast.Dispose();
+                    _bmpLast = (Bitmap)_bmpLive.Clone();
+                }
+
+                // FPS limiter
+                var msToWait = minFramePeriodMilliseconds - stopwatch.ElapsedMilliseconds;
+                if (msToWait > 0)
+                    Thread.Sleep((int)msToWait);
+                stopwatch.Restart();
+            }
         }
 
         private void timer1_Tick(object sender, System.EventArgs e)
         {
-            using Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.FillRectangle(_backgroundBrush, 0, 0, bitmap.Width, bitmap.Height);
+            lock (_bmpLast)
+            {
+                Text = _population.ToString();
+                pictureBox1.Image?.Dispose();
+                pictureBox1.Image = (Bitmap)_bmpLast.Clone();
+                pictureBox1.Refresh();
+            }
+        }
+
+        private void Render()
+        {
+            _bmpLive?.Dispose();
+            _bmpLive = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            using Graphics graphics = Graphics.FromImage(_bmpLive);
+            graphics.FillRectangle(_backgroundBrush, 0, 0, _bmpLive.Width, _bmpLive.Height);
             foreach (var obstacle in Obstacles.Get())
             {
                 graphics.FillRectangle(_obstacleBrush, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
@@ -42,7 +87,6 @@ namespace LearningAI
 
             graphics.FillEllipse(_goalBrush, _goal.X - 4, _goal.Y - 4, 8, 8);
 
-            Text = _population.ToString();
             foreach (var dotPosition in _population.GetDotPositions())
             {
                 if (dotPosition.IsBest)
@@ -54,10 +98,6 @@ namespace LearningAI
                     graphics.DrawEllipse(_dotPen, dotPosition.X - DotPosition.Radius, dotPosition.Y - DotPosition.Radius, DotPosition.Diameter, DotPosition.Diameter);
                 }
             }
-
-            pictureBox1.Image?.Dispose();
-            pictureBox1.Image = bitmap;
-            pictureBox1.Refresh();
         }
     }
 }
