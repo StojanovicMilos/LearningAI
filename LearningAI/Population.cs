@@ -64,10 +64,10 @@ namespace LearningAI
                 parentIndexes.Add(SelectParent(_dots, fitnessSum));
             });
 
-            var newDots = new List<Dot>(_dots.Count) {new Dot(bestDot)};
-            newDots.AddRange(parentIndexes.Select(parentIndex => _dots[parentIndex].CreateBaby()));
+            var newDots = new ConcurrentBag<Dot> {new Dot(bestDot)};
+            Parallel.ForEach(parentIndexes, parentIndex => newDots.Add(_dots[parentIndex].CreateBaby()));
 
-            _dots = newDots;
+            _dots = newDots.ToList();
 
             _generation++;
         }
