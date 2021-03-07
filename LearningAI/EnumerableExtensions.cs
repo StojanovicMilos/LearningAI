@@ -6,10 +6,9 @@ namespace LearningAI
 {
     public static class EnumerableExtensions
     {
-        public static T WithMaximum<T, TKey>(this IEnumerable<T> sequence, Func<T, TKey> criteria)
-            where T : class
-            where TKey : IComparable<TKey> =>
+        public static T WithMaximumScore<T>(this IEnumerable<T> sequence)
+            where T : Dot =>
             sequence.Aggregate((T)null, (best, current) =>
-                best == null || criteria(current).CompareTo(criteria(best)) > 0 ? current : best);
+                best == null || current.Fitness.Score()>best.Fitness.Score() ? current : best);
     }
 }

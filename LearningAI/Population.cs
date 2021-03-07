@@ -29,7 +29,6 @@ namespace LearningAI
 
         public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
 
-        private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
 
         public override string ToString() => $"Generation: {_generation}, iteration: {_iteration}, averageIteration: {_averageIteration}";
 
@@ -37,32 +36,27 @@ namespace LearningAI
         {
             if (ShouldEndGeneration())
             {
-                    CalculateFitness();
-                    NaturalSelection();
-                    MutateBabies();
-                    _iteration = 1;
-                    _startOfIteration = DateTime.Now;
+                CalculateFitness();
+                NaturalSelection();
+                MutateBabies();
+                _iteration = 1;
+                _startOfIteration = DateTime.Now;
             }
             else
             {
                 _iteration++;
-                Parallel.ForEach(_dots, dot => dot.Update());
-
-                _averageIteration = (int)(DateTime.Now - _startOfIteration).TotalMilliseconds / _iteration;
-                const int maxIterationTimeInMilliseconds = 15;
-                if (_averageIteration < maxIterationTimeInMilliseconds)
-                {
-                    Thread.Sleep(maxIterationTimeInMilliseconds);
-                }
+                UpdateDots();
+                ControlSpeed();
             }
         }
+        private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);
 
         private void CalculateFitness() => Parallel.ForEach(_dots, dot => dot.CalculateFitness());
 
         private void NaturalSelection()
         {
-            var bestDot = _dots.WithMaximum(d => d.Fitness);
-            double fitnessSum = _dots.Sum(d => d.Fitness);
+            var bestDot = _dots.WithMaximumScore();
+            double fitnessSum = _dots.Sum(d => d.Fitness.Score());
 
             var parentIndexes = new ConcurrentBag<int>();
             Parallel.For(1, _dots.Count, i =>
@@ -87,7 +81,7 @@ namespace LearningAI
             double runningSum = 0;
             for (int i = 0; i < bestDots.Count; i++)
             {
-                runningSum += bestDots[i].Fitness;
+                runningSum += bestDots[i].Fitness.Score();
                 if (runningSum > randomFitness)
                     return i;
             }
@@ -100,6 +94,18 @@ namespace LearningAI
             foreach (var dot in _dots.Skip(1))
             {
                 dot.MutateBrain();
+            }
+        }
+
+        private void UpdateDots() => Parallel.ForEach(_dots, dot => dot.Update());
+
+        private void ControlSpeed()
+        {
+            _averageIteration = (int)(DateTime.Now - _startOfIteration).TotalMilliseconds / _iteration;
+            const int maxIterationTimeInMilliseconds = 15;
+            if (_averageIteration < maxIterationTimeInMilliseconds)
+            {
+                Thread.Sleep(maxIterationTimeInMilliseconds);
             }
         }
     }

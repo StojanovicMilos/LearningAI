@@ -27,7 +27,7 @@ namespace LearningAI
 
         public bool IsDead { get; private set; }
         private bool _reachedGoal;
-        public double Fitness { get; private set; }
+        public Fitness Fitness { get; private set; }
 
         public DotPosition GetDotPosition() => new DotPosition {X = _positionX, Y = _positionY, IsBest = _isBest};
 
@@ -51,9 +51,9 @@ namespace LearningAI
             IsDead = true;
         }
 
-        public void CalculateFitness() => Fitness = _reachedGoal ? 0.0625 + 10000.0 / (_brain.Step * _brain.Step) : 1.0 / DistanceToGoalSquared();
+        public void CalculateFitness() => Fitness = new Fitness(_reachedGoal, _brain.Step, 0, DistanceToGoalSquared());
 
-        private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
+        private uint DistanceToGoalSquared() => (uint) ((_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y));
 
         public void Update()
         {
