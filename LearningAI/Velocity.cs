@@ -1,11 +1,10 @@
 ﻿using System.Drawing;
-using System.Linq;
 
 namespace LearningAI
 {
     public class Velocity
     {
-        private const int MaximumVelocity = 5;
+        public const int MaximumVelocity = 20;
 
         private readonly int[] _velocitiesX = new int[MaximumVelocity];
         private readonly int[] _velocitiesY = new int[MaximumVelocity];
