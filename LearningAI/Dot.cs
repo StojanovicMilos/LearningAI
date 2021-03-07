@@ -6,9 +6,7 @@ namespace LearningAI
     {
         private int _positionX = 400;
         private int _positionY = 780;
-        private int _velocityX;
-        private int _velocityY;
-        private Point _acceleration = new Point(0, 0);
+        private Velocity _velocity = new Velocity(0, 0);
         private readonly bool _isBest;
         private readonly Point _goal;
 
@@ -28,54 +26,38 @@ namespace LearningAI
         }
 
         public bool IsDead { get; private set; }
-        public bool ReachedGoal { get; private set; }
+        private bool _reachedGoal;
         public double Fitness { get; private set; }
 
         public DotPosition GetDotPosition() => new DotPosition {X = _positionX, Y = _positionY, IsBest = _isBest};
 
         private void Move()
         {
-            if (_brain.HasDirections)
+            if (_velocity.HasValue())
             {
-                _acceleration = _brain.GetNextDirection();
-            }
-            else
-            {
-                IsDead = true;
+                var (velocityX, velocityY) = _velocity.GetNext();
+                _positionX += velocityX;
+                _positionY += velocityY;
                 return;
             }
 
-            _velocityX += _acceleration.X;
-            if (_velocityX > 5)
+            if (_brain.HasDirections)
             {
-                _velocityX = 5;
-            }
-            else if (_velocityX < -5)
-            {
-                _velocityX = -5;
+                var acceleration = _brain.GetNextDirection();
+                _velocity = _velocity.Add(acceleration);
+                return;
             }
 
-            _velocityY += _acceleration.Y;
-            if (_velocityY > 5)
-            {
-                _velocityY = 5;
-            }
-            else if (_velocityY < -5)
-            {
-                _velocityY = -5;
-            }
-
-            _positionX += _velocityX;
-            _positionY += _velocityY;
+            IsDead = true;
         }
 
-        public void CalculateFitness() => Fitness = ReachedGoal ? 0.0625 + 10000.0 / (_brain.Step * _brain.Step) : 1.0 / DistanceToGoalSquared();
+        public void CalculateFitness() => Fitness = _reachedGoal ? 0.0625 + 10000.0 / (_brain.Step * _brain.Step) : 1.0 / DistanceToGoalSquared();
 
         private double DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
 
         public void Update()
         {
-            if (IsDead || ReachedGoal)
+            if (IsDead || _reachedGoal)
             {
                 return;
             }
@@ -89,7 +71,7 @@ namespace LearningAI
             Move();
             if (DistanceToGoalSquared() < 4)
             {
-                ReachedGoal = true;
+                _reachedGoal = true;
                 IsDead = true;
             }
             else if (Obstacles.AnyHitBy(GetDotPosition()))

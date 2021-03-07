@@ -39,19 +39,19 @@ namespace LearningAI
             {
                 graphics.FillRectangle(_obstacleBrush, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
             }
-            
-            graphics.FillEllipse(_goalBrush, _goal.X, _goal.Y, 8, 8);
+
+            graphics.FillEllipse(_goalBrush, _goal.X - 4, _goal.Y - 4, 8, 8);
 
             Text = _population.ToString();
             foreach (var dotPosition in _population.GetDotPositions())
             {
                 if (dotPosition.IsBest)
                 {
-                    graphics.FillEllipse(_dotBrush, dotPosition.X, dotPosition.Y, 4, 4);
+                    graphics.FillEllipse(_dotBrush, dotPosition.X - DotPosition.Radius, dotPosition.Y - DotPosition.Radius, DotPosition.Diameter, DotPosition.Diameter);
                 }
                 else
                 {
-                    graphics.DrawEllipse(_dotPen, dotPosition.X, dotPosition.Y, 4, 4);
+                    graphics.DrawEllipse(_dotPen, dotPosition.X - DotPosition.Radius, dotPosition.Y - DotPosition.Radius, DotPosition.Diameter, DotPosition.Diameter);
                 }
             }
 
