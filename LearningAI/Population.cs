@@ -44,9 +44,9 @@ namespace LearningAI
             }
             else
             {
-                _iteration++;
                 UpdateDots();
                 ControlSpeed();
+                _iteration++;
             }
         }
         private bool ShouldEndGeneration() => _dots.All(d => d.IsDead);

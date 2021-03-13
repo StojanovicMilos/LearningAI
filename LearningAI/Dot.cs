@@ -29,27 +29,7 @@ namespace LearningAI
         private bool _reachedGoal;
         public double FitnessScore { get; private set; }
 
-        public DotPosition GetDotPosition() => new DotPosition {X = _positionX, Y = _positionY, IsBest = _isBest};
-
-        private void Move()
-        {
-            if (_velocity.HasValue())
-            {
-                var (velocityX, velocityY) = _velocity.GetNext();
-                _positionX += velocityX;
-                _positionY += velocityY;
-                return;
-            }
-
-            if (_brain.HasDirections)
-            {
-                var acceleration = _brain.GetNextDirection();
-                _velocity = _velocity.Add(acceleration);
-                return;
-            }
-
-            IsDead = true;
-        }
+        public DotPosition GetDotPosition() => new DotPosition { X = _positionX, Y = _positionY, IsBest = _isBest };
 
         public void CalculateFitness() => FitnessScore = FitnessCalculator.CalculateFitness(_reachedGoal, _brain.Step, 0, DistanceToGoalSquared());
 
@@ -57,20 +37,23 @@ namespace LearningAI
 
         public void Update()
         {
-            for (int i = 0; i < Velocity.MaximumVelocity; i++)
+            while (_velocity.HasValue())
             {
                 if (IsDead || _reachedGoal)
                 {
                     return;
                 }
 
-                if (!_brain.HasDirections)
+                if (!_brain.HasDirections && !_velocity.HasValue())
                 {
                     IsDead = true;
                     return;
                 }
 
-                Move();
+                var (velocityX, velocityY) = _velocity.GetNext();
+                _positionX += velocityX;
+                _positionY += velocityY;
+
                 if (DistanceToGoalSquared() <= DotPosition.Diameter)
                 {
                     _reachedGoal = true;
@@ -81,6 +64,15 @@ namespace LearningAI
                     IsDead = true;
                 }
             }
+
+            if (!_brain.HasDirections)
+            {
+                IsDead = true;
+                return;
+            }
+
+            var acceleration = _brain.GetNextDirection();
+            _velocity = _velocity.Add(acceleration);
         }
 
         public Dot CreateBaby() => new Dot(_goal) { _brain = _brain.Copy() };
