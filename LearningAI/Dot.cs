@@ -27,7 +27,7 @@ namespace LearningAI
 
         public bool IsDead { get; private set; }
         private bool _reachedGoal;
-        public Fitness Fitness { get; private set; }
+        public double FitnessScore { get; private set; }
 
         public DotPosition GetDotPosition() => new DotPosition {X = _positionX, Y = _positionY, IsBest = _isBest};
 
@@ -51,32 +51,35 @@ namespace LearningAI
             IsDead = true;
         }
 
-        public void CalculateFitness() => Fitness = new Fitness(_reachedGoal, _brain.Step, 0, DistanceToGoalSquared());
+        public void CalculateFitness() => FitnessScore = FitnessCalculator.CalculateFitness(_reachedGoal, _brain.Step, 0, DistanceToGoalSquared());
 
-        private uint DistanceToGoalSquared() => (uint) ((_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y));
+        private int DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
 
         public void Update()
         {
-            if (IsDead || _reachedGoal)
+            for (int i = 0; i < Velocity.MaximumVelocity; i++)
             {
-                return;
-            }
+                if (IsDead || _reachedGoal)
+                {
+                    return;
+                }
 
-            if (!_brain.HasDirections)
-            {
-                IsDead = true;
-                return;
-            }
+                if (!_brain.HasDirections)
+                {
+                    IsDead = true;
+                    return;
+                }
 
-            Move();
-            if (DistanceToGoalSquared() < 4)
-            {
-                _reachedGoal = true;
-                IsDead = true;
-            }
-            else if (Obstacles.AnyHitBy(GetDotPosition()))
-            {
-                IsDead = true;
+                Move();
+                if (DistanceToGoalSquared() <= DotPosition.Diameter)
+                {
+                    _reachedGoal = true;
+                    IsDead = true;
+                }
+                else if (Obstacles.AnyHitBy(GetDotPosition()))
+                {
+                    IsDead = true;
+                }
             }
         }
 

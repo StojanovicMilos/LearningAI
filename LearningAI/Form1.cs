@@ -24,7 +24,7 @@ namespace LearningAI
             InitializeComponent();
 
             _goal = new Point(400, 10);
-            _population = new Population(35000, _goal);
+            _population = new Population(10000, _goal);
 
             new Thread(() =>
             {

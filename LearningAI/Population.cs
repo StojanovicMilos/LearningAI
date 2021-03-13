@@ -56,7 +56,7 @@ namespace LearningAI
         private void NaturalSelection()
         {
             var bestDot = _dots.WithMaximumScore();
-            double fitnessSum = _dots.Sum(d => d.Fitness.Score());
+            double fitnessSum = _dots.Sum(d => d.FitnessScore);
 
             var parentIndexes = new ConcurrentBag<int>();
             Parallel.For(1, _dots.Count, i =>
@@ -81,7 +81,7 @@ namespace LearningAI
             double runningSum = 0;
             for (int i = 0; i < bestDots.Count; i++)
             {
-                runningSum += bestDots[i].Fitness.Score();
+                runningSum += bestDots[i].FitnessScore;
                 if (runningSum > randomFitness)
                     return i;
             }
@@ -102,7 +102,7 @@ namespace LearningAI
         private void ControlSpeed()
         {
             _averageIteration = (int)(DateTime.Now - _startOfIteration).TotalMilliseconds / _iteration;
-            const int maxIterationTimeInMilliseconds = 15;
+            const int maxIterationTimeInMilliseconds = 25;
             if (_averageIteration < maxIterationTimeInMilliseconds)
             {
                 Thread.Sleep(maxIterationTimeInMilliseconds);
