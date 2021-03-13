@@ -4,7 +4,7 @@ namespace LearningAI
 {
     public class Velocity
     {
-        public const int MaximumVelocity = 20;
+        public const int MaximumVelocity = 5;
 
         private readonly int[] _velocitiesX = new int[MaximumVelocity];
         private readonly int[] _velocitiesY = new int[MaximumVelocity];
