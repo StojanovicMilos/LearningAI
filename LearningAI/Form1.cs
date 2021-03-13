@@ -39,8 +39,8 @@ namespace LearningAI
 
         private void RenderForever()
         {
-            int maxFPS = 100;
-            int minFramePeriodMilliseconds = 1000 / maxFPS;
+            const int maxFps = 100;
+            const int minFramePeriodMilliseconds = 1000 / maxFps;
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             while (true)
@@ -55,22 +55,19 @@ namespace LearningAI
                     _bmpLast = (Bitmap)_bmpLive.Clone();
                 }
 
+                pictureBox1.BeginInvoke((MethodInvoker)delegate 
+                {
+                    Text = _population.ToString();
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = (Bitmap)_bmpLast.Clone();
+                    pictureBox1.Refresh();
+                });
+
                 // FPS limiter
                 var msToWait = minFramePeriodMilliseconds - stopwatch.ElapsedMilliseconds;
                 if (msToWait > 0)
                     Thread.Sleep((int)msToWait);
                 stopwatch.Restart();
-            }
-        }
-
-        private void timer1_Tick(object sender, System.EventArgs e)
-        {
-            lock (_bmpLast)
-            {
-                Text = _population.ToString();
-                pictureBox1.Image?.Dispose();
-                pictureBox1.Image = (Bitmap)_bmpLast.Clone();
-                pictureBox1.Refresh();
             }
         }
 
