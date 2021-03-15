@@ -97,7 +97,13 @@ namespace LearningAI
             }
         }
 
-        private void UpdateDots() => Parallel.ForEach(_dots, dot => dot.Update());
+        private void UpdateDots()
+        {
+            foreach (var dot in _dots)
+            {
+                dot.Update();
+            }
+        }
 
         private void ControlSpeed()
         {

@@ -8,12 +8,15 @@ namespace LearningAI
 
         private readonly int[] _velocitiesX = new int[MaximumVelocity];
         private readonly int[] _velocitiesY = new int[MaximumVelocity];
-        private readonly int _totalX;
-        private readonly int _totalY;
+        private int _totalX;
+        private int _totalY;
         private int _index;
 
-        public Velocity(int x, int y)
+        public Velocity(int x, int y) => SetInternals(x, y);
+
+        private void SetInternals(int x, int y)
         {
+            _index = 0;
             if (x < -MaximumVelocity)
             {
                 x = -MaximumVelocity;
@@ -46,7 +49,7 @@ namespace LearningAI
                 {
                     valueX = 0;
                 }
-                else if(x > 0)
+                else if (x > 0)
                 {
                     valueX = 1;
                     x--;
@@ -82,5 +85,11 @@ namespace LearningAI
         public (int, int) GetNext() => (_velocitiesX[_index], _velocitiesY[_index++]);
 
         public Velocity Add(Point acceleration) => new Velocity(_totalX + acceleration.X, _totalY + acceleration.Y);
+
+        public void InvertX() => SetInternals(-_totalX, _totalY);
+
+        public void InvertY() => SetInternals(_totalX, -_totalY);
+
+        public void InvertBoth() => SetInternals(-_totalX, -_totalY);
     }
 }

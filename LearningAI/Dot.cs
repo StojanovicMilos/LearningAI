@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Linq;
 
 namespace LearningAI
 {
@@ -9,6 +10,7 @@ namespace LearningAI
         private Velocity _velocity = new Velocity(0, 0);
         private readonly bool _isBest;
         private readonly Point _goal;
+        private int _obstaclesHit;
 
         private Brain _brain;
 
@@ -31,12 +33,21 @@ namespace LearningAI
 
         public DotPosition GetDotPosition() => new DotPosition { X = _positionX, Y = _positionY, IsBest = _isBest };
 
-        public void CalculateFitness() => FitnessScore = FitnessCalculator.CalculateFitness(_reachedGoal, _brain.Step, 0, DistanceToGoalSquared());
+        public void CalculateFitness() => FitnessScore = FitnessCalculator.CalculateFitness(_reachedGoal, _brain.Step, _obstaclesHit, DistanceToGoalSquared());
 
         private int DistanceToGoalSquared() => (_positionX - _goal.X) * (_positionX - _goal.X) + (_positionY - _goal.Y) * (_positionY - _goal.Y);
 
         public void Update()
         {
+            if (!_brain.HasDirections)
+            {
+                IsDead = true;
+                return;
+            }
+
+            var acceleration = _brain.GetNextDirection();
+            _velocity = _velocity.Add(acceleration);
+
             while (_velocity.HasValue())
             {
                 if (IsDead || _reachedGoal)
@@ -58,21 +69,18 @@ namespace LearningAI
                 {
                     _reachedGoal = true;
                     IsDead = true;
+                    return;
                 }
-                else if (Obstacles.AnyHitBy(GetDotPosition()))
+
+                var dotPosition = GetDotPosition();
+                foreach (var obstacle in Obstacles.Get().Where(obstacle => obstacle.Hits(dotPosition)))
                 {
-                    IsDead = true;
+                    _obstaclesHit++;
+                    obstacle.UpdateVelocity(dotPosition, _velocity);
                 }
             }
 
-            if (!_brain.HasDirections)
-            {
-                IsDead = true;
-                return;
-            }
-
-            var acceleration = _brain.GetNextDirection();
-            _velocity = _velocity.Add(acceleration);
+            
         }
 
         public Dot CreateBaby() => new Dot(_goal) { _brain = _brain.Copy() };

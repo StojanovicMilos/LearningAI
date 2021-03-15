@@ -5,7 +5,7 @@ namespace LearningAI
 {
     public static class Obstacles
     {
-        private static readonly IEnumerable<Obstacle> obstacles = new Obstacle[]
+        private static readonly IEnumerable<Obstacle> obstacles = new[]
         {
             new Obstacle(0, 0, 800, 10),
             new Obstacle(0, 0, 10, 800),
