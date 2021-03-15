@@ -30,22 +30,23 @@ namespace LearningAI
         public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
 
 
-        public override string ToString() => $"Generation: {_generation}, iteration: {_iteration}, averageIteration: {_averageIteration}";
+        public override string ToString() => $"Generation: {_generation}, iteration: {_iteration-1}, averageIteration: {_averageIteration}";
 
         public void Update()
         {
+            UpdateDots();
+            ControlSpeed();
+
             if (ShouldEndGeneration())
             {
+                _iteration = 1;
                 CalculateFitness();
                 NaturalSelection();
                 MutateBabies();
-                _iteration = 1;
                 _startOfIteration = DateTime.Now;
             }
             else
             {
-                UpdateDots();
-                ControlSpeed();
                 _iteration++;
             }
         }
