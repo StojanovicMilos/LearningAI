@@ -6,36 +6,36 @@ namespace LearningAI
 {
     public class Brain
     {
-        private Point[] _directions;
+        public Point[] Directions { get; }
         private readonly Random _random = new Random();
 
-        public Brain(uint size)
+        public const int Size = 1000;
+
+        public Brain(Point[] directions)
         {
-            _directions = new Point[size];
-            for (int i = 0; i < _directions.Length; i++)
-            {
-                _directions[i] = DirectionsProvider.GetRandomDirection();
-            }
+            if (directions == null) throw new ArgumentNullException(nameof(directions));
+            if(directions.Length != Size)
+                throw new ArgumentOutOfRangeException(nameof(directions));
+
+            Directions = directions;
         }
 
-        private Brain() { }
-
-        public bool HasDirections => Step < _directions.Length;
+        public bool HasDirections => Step < Directions.Length;
         public uint Step { get; private set; }
 
-        public Point GetNextDirection() => _directions[Step++];
+        public Point GetNextDirection() => Directions[Step++];
 
-        public Brain Copy() => new Brain {_directions = _directions.Select(d => new Point(d.X, d.Y)).ToArray()};
+        public Point[] CopyDirections() => Directions.Select(d => new Point(d.X, d.Y)).ToArray();
 
         public void Mutate()
         {
             const double mutationRate = 0.01;
 
-            for (int i = 0; i < _directions.Length; i++)
+            for (int i = 0; i < Directions.Length; i++)
             {
                 if (mutationRate > _random.NextDouble())
                 {
-                    _directions[i] = DirectionsProvider.GetRandomDirection();
+                    Directions[i] = DirectionsProvider.GetRandomDirection();
                 }
             }
         }

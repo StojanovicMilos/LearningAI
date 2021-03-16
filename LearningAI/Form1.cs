@@ -14,6 +14,7 @@ namespace LearningAI
         private readonly Pen _dotPen = new Pen(Color.YellowGreen);
         private readonly Point _goal;
         private readonly Population _population;
+        private bool _theEnd;
 
 
         private Bitmap _bmpLive = new Bitmap(1,1);
@@ -24,29 +25,29 @@ namespace LearningAI
             InitializeComponent();
 
             _goal = new Point(400, 20);
-            _population = new Population(10000, _goal);
+            _population = new Population(10000, _goal, PopulationFactory.GetGeneration());
 
             new Thread(() =>
             {
-                while (true)
+                while (!_theEnd)
                 {
                     _population.Update();
                 }
             }).Start();
 
-            new Thread(RenderForever).Start();
+            new Thread(Render).Start();
         }
 
-        private void RenderForever()
+        private void Render()
         {
             const int maxFps = 100;
             const int minFramePeriodMilliseconds = 1000 / maxFps;
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            while (true)
+            while (!_theEnd)
             {
                 // Render on the "live" Bitmap
-                Render();
+                RenderLiveBitmap();
 
                 // Lock and update the "display" Bitmap
                 lock (_bmpLast)
@@ -71,7 +72,7 @@ namespace LearningAI
             }
         }
 
-        private void Render()
+        private void RenderLiveBitmap()
         {
             _bmpLive?.Dispose();
             _bmpLive = new Bitmap(pictureBox1.Width, pictureBox1.Height);
@@ -95,6 +96,13 @@ namespace LearningAI
                     graphics.DrawEllipse(_dotPen, dotPosition.X - DotPosition.Radius, dotPosition.Y - DotPosition.Radius, DotPosition.Diameter, DotPosition.Diameter);
                 }
             }
+        }
+
+        private void button1_Click(object sender, System.EventArgs e)
+        {
+            _theEnd = true;
+            _population.Save();
+            Close();
         }
     }
 }

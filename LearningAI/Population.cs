@@ -11,24 +11,20 @@ namespace LearningAI
     public class Population
     {
         private List<Dot> _dots;
-        private int _generation = 1;
+        private int _generation;
         private int _iteration = 1;
         private int _averageIteration;
         private DateTime _startOfIteration;
 
-        public Population(int size, Point goal)
+        public Population(int numberOfDots, Point goal, int generation)
         {
-            _dots = new List<Dot>(size);
-            for (int i = 0; i < size; i++)
-            {
-                _dots.Add(new Dot(goal));
-            }
+            _dots = DotsFactory.GetDots(numberOfDots, goal);
 
             _startOfIteration = DateTime.Now;
+            _generation = generation;
         }
 
         public IEnumerable<DotPosition> GetDotPositions() => _dots.Select(d => d.GetDotPosition());
-
 
         public override string ToString() => $"Generation: {_generation}, iteration: {_iteration-1}, averageIteration: {_averageIteration}";
 
@@ -114,6 +110,12 @@ namespace LearningAI
             {
                 Thread.Sleep(maxIterationTimeInMilliseconds);
             }
+        }
+
+        public void Save()
+        {
+            PopulationFactory.Save(_generation);
+            DotsFactory.SaveDirection(_dots.OrderByDescending(dot => dot.FitnessScore).Select(dot => dot.GetDirection()));
         }
     }
 }

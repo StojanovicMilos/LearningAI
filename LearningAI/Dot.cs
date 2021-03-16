@@ -12,18 +12,18 @@ namespace LearningAI
         private readonly Point _goal;
         private int _obstaclesHit;
 
-        private Brain _brain;
+        private readonly Brain _brain;
 
-        public Dot(Point goal)
+        public Dot(Point goal, Point[] directions)
         {
             _goal = goal;
-            _brain = new Brain(1000);
+            _brain = new Brain(directions);
         }
 
         public Dot(Dot dot)
         {
             _goal = dot._goal;
-            _brain = dot._brain.Copy();
+            _brain = new Brain(dot._brain.CopyDirections());
             _isBest = true;
         }
 
@@ -83,8 +83,10 @@ namespace LearningAI
             
         }
 
-        public Dot CreateBaby() => new Dot(_goal) { _brain = _brain.Copy() };
+        public Dot CreateBaby() => new Dot(_goal, _brain.CopyDirections());
 
         public void MutateBrain() => _brain.Mutate();
+
+        public Point[] GetDirection() => _brain.Directions;
     }
 }
