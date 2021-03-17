@@ -35,11 +35,11 @@ namespace LearningAI
 
             if (ShouldEndGeneration())
             {
-                _iteration = 1;
                 CalculateFitness();
                 NaturalSelection();
                 MutateBabies();
                 _startOfIteration = DateTime.Now;
+                _iteration = 1;
             }
             else
             {
